@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yangrr.center.common.ErrorCode;
 import com.yangrr.center.exception.BusinessException;
 import com.yangrr.center.model.domain.User;
+import com.yangrr.center.model.request.SearchRequest;
 import com.yangrr.center.service.UserService;
 import com.yangrr.center.mapper.UserMapper;
 import jakarta.annotation.Resource;
@@ -169,10 +170,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public List<User> searchUsers(String username) {
+    public List<User> searchUsers(SearchRequest searchRequest) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        if(StringUtils.isNoneBlank(username)){
-            queryWrapper.like("username",username);
+        if(StringUtils.isNoneBlank(searchRequest.getUsername())){
+            queryWrapper.like("username",searchRequest.getUsername());
+        }
+
+        if (StringUtils.isNoneBlank(searchRequest.getSortField())){
+            String sortOrder = searchRequest.getSortOrder();
+            if(sortOrder.equals("ascend")){
+
+                queryWrapper.orderBy(true,true,searchRequest.getSortField());
+            }else {
+                queryWrapper.orderBy(true,false,searchRequest.getSortField());
+
+            }
         }
 
         List<User> userList = this.list(queryWrapper);

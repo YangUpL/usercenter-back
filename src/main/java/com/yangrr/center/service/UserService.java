@@ -2,6 +2,7 @@ package com.yangrr.center.service;
 
 import com.yangrr.center.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yangrr.center.model.request.SearchRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -39,10 +40,10 @@ public interface UserService extends IService<User> {
 
     /**
      * 管理员查用户
-     * @param username  用户名(前端传参则根据username模糊查询 否则查全表)
+     * @param searchRequest  查询用到的用户数据
      * @return  用户集合
      */
-    List<User> searchUsers(String username);
+    List<User> searchUsers(SearchRequest searchRequest);
 
     /**
      * 管理员删用户

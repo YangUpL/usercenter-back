@@ -6,6 +6,7 @@ import com.yangrr.center.common.ErrorCode;
 import com.yangrr.center.common.ResultUtils;
 import com.yangrr.center.exception.BusinessException;
 import com.yangrr.center.model.domain.User;
+import com.yangrr.center.model.request.SearchRequest;
 import com.yangrr.center.model.request.UserLoginRequest;
 import com.yangrr.center.model.request.UserRegisterRequest;
 import com.yangrr.center.service.UserService;
@@ -24,7 +25,7 @@ import static com.yangrr.center.constant.UserConstant.USER_LOGIN_STATE;
 /**
  * 用户接口
  */
-@CrossOrigin(value = "http://8.130.183.113",allowCredentials = "true")
+@CrossOrigin(value = {"http://localhost:8000","http://8.130.183.113","http://www.yangrr.love/"},allowCredentials = "true")
 @RestController
 @RequestMapping("user")
 public class UserController {
@@ -90,15 +91,16 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
-    @GetMapping("search")
-    public BaseResponse<List<User>> searchUsers(String username,HttpServletRequest request){
+    @PostMapping("search")
+    public BaseResponse<List<User>> searchUsers(@RequestBody SearchRequest searchRequest,HttpServletRequest request){
 
-        if(!isAdmin(request)){
+        System.out.println(searchRequest);
+        if (!isAdmin(request)) {
             ArrayList<User> arrayList = new ArrayList<>();
             return ResultUtils.success(arrayList);
         }
 
-        List<User> userList = userService.searchUsers(username);
+        List<User> userList = userService.searchUsers(searchRequest);
         return ResultUtils.success(userList);
     }
 
