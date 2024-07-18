@@ -2,6 +2,7 @@ package com.yangrr.center.mapper;
 
 import com.yangrr.center.model.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yangrr.center.model.request.UpdateRequest;
 
 /**
 * @author yangRR
@@ -11,6 +12,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface UserMapper extends BaseMapper<User> {
 
+    int updateUser(UpdateRequest updateRequest);
+
+    int addUser(User user);
 }
 
 

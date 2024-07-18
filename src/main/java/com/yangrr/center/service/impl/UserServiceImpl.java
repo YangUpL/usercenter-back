@@ -7,6 +7,7 @@ import com.yangrr.center.common.ErrorCode;
 import com.yangrr.center.exception.BusinessException;
 import com.yangrr.center.model.domain.User;
 import com.yangrr.center.model.request.SearchRequest;
+import com.yangrr.center.model.request.UpdateRequest;
 import com.yangrr.center.service.UserService;
 import com.yangrr.center.mapper.UserMapper;
 import jakarta.annotation.Resource;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,10 +43,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public Long userRegister(String userAccount, String userPassword, String checkPassword, String planetCode) {
+    public Long userRegister(String userAccount, String userPassword, String checkPassword, Long planetCode) {
 
         //校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword,planetCode)) {
+        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.NULL_ERROR);
         }
 
@@ -57,7 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
 
         // 用户编号长度1~5位
-        if (planetCode.length() > 5) {
+        if (planetCode.toString().length() > 5) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "星球编号太长");
         }
 
@@ -217,6 +219,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserRole(originUser.getUserRole());
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setCreateTime(originUser.getCreateTime());
+        safetyUser.setUpdateTime(originUser.getUpdateTime());
         safetyUser.setPlanetCode(originUser.getPlanetCode());
 
         return safetyUser;
@@ -225,6 +228,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public void userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE);
+    }
+
+    @Override
+    public boolean updateUser(UpdateRequest updateRequest) {
+        updateRequest.setUpdateTime(new Date());
+
+        userMapper.updateUser(updateRequest);
+        return true;
+    }
+
+    @Override
+    public boolean addUser(User user) {
+
+        Date date = new Date();
+        user.setUserPassword("12345678");
+        user.setCreateTime(date);
+        user.setUpdateTime(date);
+//        System.err.println(userMapper.selectCount(new QueryWrapper<>()));
+        user.setPlanetCode(userMapper.selectCount(new QueryWrapper<>()) + 1);
+        userMapper.addUser(user);
+
+        return true;
     }
 }
 

@@ -57,7 +57,7 @@ public class UserServiceTest {
         String userAccount = "yang";
         String userPassword = "12345678";
         String checkPassword = "12345678";
-        String planetCode = "1";
+        Long planetCode = 1L;
 
 
         Long result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);

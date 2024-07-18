@@ -3,6 +3,7 @@ package com.yangrr.center.service;
 import com.yangrr.center.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yangrr.center.model.request.SearchRequest;
+import com.yangrr.center.model.request.UpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface UserService extends IService<User> {
      * @param planetCode
      * @return 影响行数
      */
-    Long userRegister(String userAccount, String userPassword, String checkPassword, String planetCode);
+    Long userRegister(String userAccount, String userPassword, String checkPassword, Long planetCode);
 
 
     /**
@@ -61,4 +62,8 @@ public interface UserService extends IService<User> {
     User getSafetyUser(User originUser);
 
     void userLogout(HttpServletRequest request);
+
+    boolean updateUser(UpdateRequest updateRequest);
+
+    boolean addUser(User user);
 }

@@ -16,13 +16,9 @@ public class SearchRequest implements Serializable {
 
     private Integer gender;
 
-    private String userPassword;
-
     private String phone;
 
     private Integer userStatus;
-
-    private Date createTime;
 
     private Integer userRole;
 

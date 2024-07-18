@@ -1,22 +1,21 @@
-package com.yangrr.center.model.domain;
+package com.yangrr.center.model.request;
 
-import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
- * 
- * @TableName user
+ * @PATH com.yangrr.center.model.request.UpdateRequest
+ * @Author YangRR
+ * @CreateData 2024-07-17 20:03
+ * @Description:
  */
-@TableName(value ="user")
+
 @Data
-public class User implements Serializable {
+public class UpdateRequest {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -40,11 +39,6 @@ public class User implements Serializable {
     private Integer gender;
 
     /**
-     * 密码
-     */
-    private String userPassword;
-
-    /**
      * 电话
      */
     private String phone;
@@ -59,33 +53,15 @@ public class User implements Serializable {
      */
     private Integer userStatus;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 
     /**
      * 更新时间
      */
     private Date updateTime;
 
-    /**
-     * 是否删除（逻辑删除）
-     */
-
-    @TableLogic
-    private Integer isDelete;
 
     /**
      * 用户权限 0- 普通用户 1 - 管理员
      */
     private Integer userRole;
-
-    /**
-     * 星球编号
-     */
-    private Long planetCode;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }
