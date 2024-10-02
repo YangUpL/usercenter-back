@@ -8,18 +8,16 @@ import com.yangrr.center.common.ResultUtils;
 import com.yangrr.center.exception.BusinessException;
 import com.yangrr.center.model.domain.User;
 import com.yangrr.center.model.request.*;
+import com.yangrr.center.service.ScheduleService;
 import com.yangrr.center.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
-import java.util.Locale;
 
 import static com.yangrr.center.constant.UserConstant.ADMIN_ROLE;
 import static com.yangrr.center.constant.UserConstant.USER_LOGIN_STATE;
@@ -36,6 +34,9 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private ScheduleService scheduleService;
+
     @PostMapping("register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
 
@@ -48,7 +49,6 @@ public class UserController {
         String checkPassword = userRegisterRequest.getCheckPassword();
 
         Long planetCode = userService.count(new QueryWrapper<>()) + 1;
-//        System.out.println(planetCode);
 
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)){
             throw new BusinessException(ErrorCode.NULL_ERROR);
@@ -76,7 +76,7 @@ public class UserController {
 
         User user = userService.userLogin(userAccount, userPassword, request);
 
-            return ResultUtils.success(user);
+        return ResultUtils.success(user);
 
     }
 
@@ -134,35 +134,64 @@ public class UserController {
     }
 
     @PostMapping("update")
-    public boolean updateUser(@RequestBody UpdateRequest updateRequest){
+    public BaseResponse<Boolean> updateUser(@RequestBody UpdateRequest updateRequest,HttpServletRequest request){
 
         if (updateRequest == null){
-            return false;
+            throw new BusinessException(ErrorCode.NULL_ERROR);
         }
 
-        userService.updateUser(updateRequest);
+        if (!isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
 
-        return true;
+        Boolean b = userService.updateUser(updateRequest);
+
+        return ResultUtils.success(b);
+
     }
 
 
     @PostMapping("add")
-    public boolean addUser(@RequestBody User user){
+    public BaseResponse<AddUserRequest> addUser(@RequestBody AddUserRequest addUserRequest,HttpServletRequest request){
 
-        if (user == null){
-            return false;
+        if (!isAdmin(request)) {
+            return ResultUtils.error(ErrorCode.NO_AUTH,"无权限");
         }
 
-        userService.addUser(user);
-        return true;
+
+        if (addUserRequest.getUserAccount() == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账户必须存在");
+        }
+
+        userService.addUser(addUserRequest);
+        return ResultUtils.success(addUserRequest);
     }
+
+
+    @PostMapping("updateSelf")
+
+    public BaseResponse<Boolean> updateSelf(@RequestBody UpdateSelfRequest updateSelfRequest,
+                                         HttpServletRequest request) {
+        if (updateSelfRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+        }
+
+        updateSelfRequest.setId(user.getId());
+
+        Boolean bool = userService.updateUserSelf(updateSelfRequest);
+
+        return ResultUtils.success(bool);
+
+    }
+
+
 
     private boolean isAdmin(HttpServletRequest request){
         User user = (User)request.getSession().getAttribute(USER_LOGIN_STATE);
         return user != null && user.getUserRole() == ADMIN_ROLE;
     }
-
-
-
-
 }

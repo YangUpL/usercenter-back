@@ -6,8 +6,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yangrr.center.common.ErrorCode;
 import com.yangrr.center.exception.BusinessException;
 import com.yangrr.center.model.domain.User;
+import com.yangrr.center.model.request.AddUserRequest;
 import com.yangrr.center.model.request.SearchRequest;
 import com.yangrr.center.model.request.UpdateRequest;
+import com.yangrr.center.model.request.UpdateSelfRequest;
 import com.yangrr.center.service.UserService;
 import com.yangrr.center.mapper.UserMapper;
 import jakarta.annotation.Resource;
@@ -82,7 +84,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //账户不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper();
         queryWrapper.eq("userAccount", userAccount);
-//        long count = this.count(queryWrapper);
         Long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号重复");
@@ -152,7 +153,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         QueryWrapper<User> queryWrapper = new QueryWrapper();
         queryWrapper.eq("userAccount", userAccount);
         queryWrapper.eq("userPassword", encryptPassword);
+        System.err.println(userMapper);
         User user = userMapper.selectOne(queryWrapper);
+
 
         if(user == null){
             log.info("user login failed, userAccount cannot match userPassword");
@@ -231,25 +234,93 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public boolean updateUser(UpdateRequest updateRequest) {
-        updateRequest.setUpdateTime(new Date());
+    public Boolean updateUser(UpdateRequest updateRequest) {
 
-        userMapper.updateUser(updateRequest);
-        return true;
+        //校验
+        if (StringUtils.isAnyBlank(updateRequest.getUserAccount())) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+
+        if (updateRequest.getUserAccount().length() < 4) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号过短");
+        }
+
+
+        // 账户不包含特殊字符
+        String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%…… &*（）——+|{}【】‘；：”“’。，、？]";
+        Matcher matcher = Pattern.compile(validPattern).matcher(updateRequest.getUserAccount());
+        // 如果包含非法字符，则返回
+        if (matcher.find()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码不能包含特殊字符");
+        }
+
+
+        List<User> userList = userMapper.selectList(new QueryWrapper<User>().
+                eq("userAccount", updateRequest.getUserAccount()));
+
+        if (userList != null &&
+                !userList.isEmpty() &&
+                !userList.get(0).getId().equals(updateRequest.getId())){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户名存在");
+        }
+
+        int rows = userMapper.updateUser(updateRequest);
+
+        return rows > 0;
     }
 
     @Override
-    public boolean addUser(User user) {
+    public boolean addUser(AddUserRequest addUserRequest) {
 
-        Date date = new Date();
-        user.setUserPassword("12345678");
-        user.setCreateTime(date);
-        user.setUpdateTime(date);
-//        System.err.println(userMapper.selectCount(new QueryWrapper<>()));
+        //校验
+        if (StringUtils.isAnyBlank(addUserRequest.getUserAccount())) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+
+        if (addUserRequest.getUserAccount().length() < 4) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号过短");
+        }
+
+
+        // 账户不包含特殊字符
+        String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%…… &*（）——+|{}【】‘；：”“’。，、？]";
+        Matcher matcher = Pattern.compile(validPattern).matcher(addUserRequest.getUserAccount());
+        // 如果包含非法字符，则返回
+        if (matcher.find()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码不能包含特殊字符");
+        }
+
+        User user = new User();
+        user.setUsername(addUserRequest.getUsername());
+        user.setUserAccount(addUserRequest.getUserAccount());
+        user.setAvatarUrl(addUserRequest.getAvatarUrl());
+        user.setGender(addUserRequest.getGender());
+        user.setPhone(addUserRequest.getPhone());
+        user.setEmail(addUserRequest.getEmail());
+        user.setUserStatus(addUserRequest.getUserStatus());
+        user.setUserRole(addUserRequest.getUserRole());
+        user.setUserPassword(DigestUtils.md5DigestAsHex((SALT +
+                "12345678").getBytes(StandardCharsets.UTF_8)));
         user.setPlanetCode(userMapper.selectCount(new QueryWrapper<>()) + 1);
         userMapper.addUser(user);
 
         return true;
+    }
+
+    @Override
+    public Boolean updateUserSelf(UpdateSelfRequest updateSelfRequest) {
+
+        User user = new User();
+        user.setUsername(updateSelfRequest.getUsername());
+        user.setUserAccount(updateSelfRequest.getUserAccount());
+        user.setGender(updateSelfRequest.getGender());
+        user.setPhone(updateSelfRequest.getPhone());
+        user.setEmail(updateSelfRequest.getEmail());
+
+        int id = userMapper.
+                update(user, new QueryWrapper<User>().
+                        eq("id", updateSelfRequest.getId()));
+        return id > 0;
     }
 }
 

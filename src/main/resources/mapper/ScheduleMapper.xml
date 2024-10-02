@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangrr.center.mapper.ScheduleMapper">
+
+    <resultMap id="BaseResultMap" type="com.yangrr.center.model.domain.Schedule">
+            <id property="id" column="tId" jdbcType="BIGINT"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="state" column="state" jdbcType="SMALLINT"/>
+            <result property="deadline" column="deadline" jdbcType="DATE"/>
+            <result property="uid" column="uId" jdbcType="BIGINT"/>
+            <result property="isDelete" column="isDelete" jdbcType="SMALLINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tId,title,description,
+        state,deadline,uId,
+        isDelete
+    </sql>
+</mapper>

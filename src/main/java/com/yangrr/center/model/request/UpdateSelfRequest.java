@@ -2,8 +2,6 @@ package com.yangrr.center.model.request;
 
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @PATH com.yangrr.center.model.request.UpdateRequest
  * @Author YangRR
@@ -12,11 +10,13 @@ import java.util.Date;
  */
 
 @Data
-public class UpdateRequest {
+public class UpdateSelfRequest {
+
     /**
      * id
      */
     private Long id;
+
 
     /**
      * 用户昵称
@@ -27,11 +27,6 @@ public class UpdateRequest {
      * 账号
      */
     private String userAccount;
-
-    /**
-     * 用户头像
-     */
-    private String avatarUrl;
 
     /**
      * 性别
@@ -48,14 +43,5 @@ public class UpdateRequest {
      */
     private String email;
 
-    /**
-     * 状态 0 - 正常
-     */
-    private Integer userStatus;
 
-
-    /**
-     * 用户权限 0- 普通用户 1 - 管理员
-     */
-    private Integer userRole;
 }

@@ -30,15 +30,18 @@
     </sql>
     <insert id="addUser">
         insert into user
-        values (default,#{username},#{userAccount},#{avatarUrl},#{gender},#{userPassword},#{phone},#{email},
-               #{userStatus},#{createTime},#{updateTime},0,#{userRole},#{planetCode});
+        (username, userAccount, gender, userPassword, phone, email, userStatus, userRole, planetCode)
+        values (#{username},#{userAccount},#{gender},#{userPassword},#{phone},#{email},#{userStatus},#{userRole},#{planetCode})
+        <if test="avatarUrl!= null and avatarUrl!= ''">
+            ,#{avatarUrl}
+        </if>
     </insert>
 
 
     <update id="updateUser">
         update user set username = #{username},userAccount = #{userAccount},
         avatarUrl = #{avatarUrl},gender = #{gender}, phone = #{phone},
-        email = #{email},userStatus = #{userStatus},updateTime = #{updateTime},
+        email = #{email},userStatus = #{userStatus},
         userRole = #{userRole} where id = #{id}
     </update>
 </mapper>

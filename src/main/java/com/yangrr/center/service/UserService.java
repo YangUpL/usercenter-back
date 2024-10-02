@@ -2,8 +2,10 @@ package com.yangrr.center.service;
 
 import com.yangrr.center.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yangrr.center.model.request.AddUserRequest;
 import com.yangrr.center.model.request.SearchRequest;
 import com.yangrr.center.model.request.UpdateRequest;
+import com.yangrr.center.model.request.UpdateSelfRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -63,7 +65,9 @@ public interface UserService extends IService<User> {
 
     void userLogout(HttpServletRequest request);
 
-    boolean updateUser(UpdateRequest updateRequest);
+    Boolean updateUser(UpdateRequest updateRequest);
 
-    boolean addUser(User user);
+    boolean addUser(AddUserRequest addUserRequest);
+
+    Boolean updateUserSelf(UpdateSelfRequest updateSelfRequest);
 }

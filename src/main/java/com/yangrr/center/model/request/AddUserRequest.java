@@ -5,18 +5,13 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @PATH com.yangrr.center.model.request.UpdateRequest
+ * @PATH com.yangrr.center.model.request.AddUserRequest
  * @Author YangRR
- * @CreateData 2024-07-17 20:03
+ * @CreateData 2024-08-15 13:57
  * @Description:
  */
-
 @Data
-public class UpdateRequest {
-    /**
-     * id
-     */
-    private Long id;
+public class AddUserRequest {
 
     /**
      * 用户昵称
